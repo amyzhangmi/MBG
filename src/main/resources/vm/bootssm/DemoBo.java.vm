@@ -1,0 +1,30 @@
+package ${table.basePackage}.${moduleName}.bo;
+
+import ${table.commonBasePackage}.common.entity.BaseEntity;
+import lombok.Getter;
+import lombok.Setter;
+#foreach($boImportField in ${table.boImportList})
+$boImportField
+#end
+
+/**
+ * ${tableComment}
+ *
+ * @author ${table.author}
+ * @history ${table.date} 新建
+ * @since ${table.since}
+ */
+@Getter
+@Setter
+public class ${className}Bo extends BaseEntity {
+
+#foreach ($column in $columns)
+#if($column.boField)
+    /**
+     * $column.columnComment
+     */
+    private $column.javaType $column.camelName;
+
+#end
+#end
+}

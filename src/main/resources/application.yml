@@ -1,0 +1,63 @@
+server:
+  port: 18005
+
+spring:
+  # 数据源
+  datasource:
+    url: jdbc:mysql://192.168.64.201:3306/boot_ssm?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+    username: root
+    password: root
+
+
+# mybatis
+mybatis:
+  mapper-locations:
+    classpath*:mapper/**/*Mapper.xml
+
+gen:
+  author: amyzhang
+  dateFmt: yyyy/MM/dd
+  since: JDK1.8
+  commonBasePackage: com.amy.framework
+  basePackage: com.amy.bootssm
+  moduleName: sys
+  templatePath: vm/bootssm
+  templateNames:
+    - DemoBo.java.vm
+    - DemoDto.java.vm
+    - DemoVo.java.vm
+    - DemoController.java.vm
+    - DemoService.java.vm
+    - DemoServiceImpl.java.vm
+    - DemoMapper.java.vm
+    - DemoMapper.xml.vm
+    - Demo.js.vm
+    - Demo.vue.vm
+  boNotContainFields:
+    - createBy
+    - createTime
+    - updateBy
+    - updateTime
+    - isDeleted
+  voNotContainFields:
+    - createBy
+    - createTime
+    - updateBy
+    - updateTime
+    - isDeleted
+  dtoNotContainFields:
+    - createBy
+    - createTime
+    - updateBy
+    - updateTime
+    - isDeleted
+  vueNotContainFields:
+    - createBy
+    - createTime
+    - updateBy
+    - updateTime
+
+
+
+
+

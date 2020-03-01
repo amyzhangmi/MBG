@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="${table.basePackage}.${moduleName}.mapper.${className}Mapper">
+
+    <resultMap id="Base_Result_Map" type="${table.basePackage}.${moduleName}.bo.${className}Bo">
+#foreach ($column in $columns)
+#if($column.pk)
+        <id column="$column.columnName" property="$column.camelName"/>
+#else
+        <result column="$column.columnName" property="$column.camelName"/>
+#end
+#end
+    </resultMap>
+
+    <sql id="Base_Column_List">
+#foreach ($column in $columns)
+        $column.columnName#if($velocityCount != $columns.size()),#end
+#end
+
+    </sql>
+
+    <sql id="Table_Name">
+        ${tableName}
+    </sql>
+
+    <sql id="From_table ">
+        from
+        <include refid="Table_Name" />
+    </sql>
+
+
+    <sql id="Normal_Where">
+        <trim prefix="where" prefixOverrides="and | or">
+#foreach ($column in $columns)
+#if($column.javaType == 'String')
+        <if test="null != $column.camelName and '' != $column.camelName">and $column.columnName = #{$column.camelName}</if>
+#else
+        <if test="null != $column.camelName">and $column.columnName = #{$column.camelName}</if>
+#end
+#end
+        </trim>
+    </sql>
+
+    <sql id="Page_Where">
+        <include refid="Normal_Where" />
+        order by update_time desc,is_deleted asc
+        limit #{startRow},#{pageSize}
+    </sql>
+
+    <insert id="insert" parameterType="${table.basePackage}.${moduleName}.bo.${className}Bo">
+        insert into
+        <include refid="Table_Name" />
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+#foreach ($column in $columns)
+#if($column.javaType == 'String')
+            <if test="null != $column.camelName and '' != $column.camelName">$column.columnName,</if>
+#else
+            <if test="null != $column.camelName">$column.columnName,</if>
+#end
+#end
+        </trim>
+        <trim prefix="values(" suffix=")" suffixOverrides=",">
+#foreach ($column in $columns)
+#if($column.javaType == 'String')
+            <if test="null != $column.camelName and '' != $column.camelName">#{$column.camelName},</if>
+#else
+            <if test="null != $column.camelName">#{$column.camelName},</if>
+#end
+#end
+        </trim>
+    </insert>
+
+    <delete id="delete" parameterType="java.lang.Long">
+        update
+        <include refid="Table_Name" />
+        set
+        is_deleted = 1
+        where
+#foreach ($column in $columns)
+#if($column.pk)
+        $column.columnName = #{id}
+#end
+#end
+    </delete>
+
+    <update id="update" parameterType="${table.basePackage}.${moduleName}.bo.${className}Bo">
+        update
+        <include refid="Table_Name" />
+        <trim prefix="set" suffixOverrides=",">
+#foreach ($column in $columns)
+#if($column.javaType == 'String')
+            <if test="null != $column.camelName and '' != $column.camelName">$column.columnName = #{$column.camelName},</if>
+#else
+            <if test="null != $column.camelName">$column.columnName = #{$column.camelName},</if>
+#end
+#end
+        </trim>
+        where
+#foreach ($column in $columns)
+#if($column.pk)
+        $column.columnName = #{$column.camelName}
+#end
+#end
+    </update>
+
+    <select id="findPage" resultMap="Base_Result_Map" parameterType="${table.basePackage}.${moduleName}.dto.${className}Dto">
+        select
+        <include refid="Base_Column_List"/>
+        <include refid="From_table " />
+        <include refid="Page_Where" />
+    </select>
+
+    <select id="findCount" resultType="java.lang.Long" parameterType="${table.basePackage}.${moduleName}.dto.${className}Dto">
+        select
+        count(1)
+        <include refid="From_table " />
+        <include refid="Normal_Where" />
+    </select>
+
+    <select id="findById" resultMap="Base_Result_Map" parameterType="java.lang.Long">
+        select
+        <include refid="Base_Column_List"/>
+        <include refid="From_table " />
+        where
+#foreach ($column in $columns)
+#if($column.pk)
+        $column.columnName = #{id}
+#end
+#end
+    </select>
+</mapper>

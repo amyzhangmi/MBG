@@ -1,0 +1,8 @@
+package ${table.basePackage}.${moduleName}.service;
+
+import ${table.commonBasePackage}.common.base.BaseService;
+import ${table.basePackage}.${moduleName}.dto.${className}Dto;
+import ${table.basePackage}.${moduleName}.vo.${className}Vo;
+
+public interface ${className}Service extends BaseService<${className}Dto, ${className}Vo> {
+}

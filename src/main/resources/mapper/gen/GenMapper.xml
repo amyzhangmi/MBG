@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.amy.mbg.gen.mapper.GenMapper">
+
+    <resultMap id="Base_Result_Map" type="com.amy.mbg.gen.bo.TableBo">
+        <id column="table_name" property="tableName"/>
+        <result column="table_comment" property="tableComment"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        table_name , table_comment, create_time
+    </sql>
+
+    <sql id="Table_Name">
+        information_schema. TABLES
+    </sql>
+
+    <sql id="From_table ">
+        from
+        <include refid="Table_Name"/>
+    </sql>
+
+    <sql id="Normal_Where">
+        where table_schema = (select database())
+        <if test="null != tableName and '' != tableName">and table_name like concat(#{tableName},'%')</if>
+        <if test="null != tableComment and '' != tableComment">and table_comment = #{tableComment}</if>
+    </sql>
+
+    <sql id="Page_Where">
+        <include refid="Normal_Where"/>
+        order by update_time desc
+        limit #{startRow},#{pageSize}
+    </sql>
+
+
+    <select id="findPage" parameterType="com.amy.mbg.gen.dto.GenDto" resultMap="Base_Result_Map">
+        select
+        <include refid="Base_Column_List"/>
+        <include refid="From_table "/>
+        <include refid="Page_Where"/>
+    </select>
+
+    <select id="findCount" resultType="java.lang.Long" parameterType="com.amy.mbg.gen.dto.GenDto">
+        select
+        count(1)
+        <include refid="From_table "/>
+        <include refid="Normal_Where"/>
+    </select>
+
+    <select id="selectColumnInfo" parameterType="string" resultType="com.amy.mbg.gen.bo.ColumnBo">
+        select
+        column_name as columnName, column_type as columnType, column_comment as columnComment,column_key as columnKey
+        from
+        information_schema.COLUMNS
+        where table_schema = (select database())
+        and table_name = #{tableName}
+    </select>
+
+</mapper>

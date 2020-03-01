@@ -1,0 +1,29 @@
+package ${table.basePackage}.${moduleName}.vo;
+
+import lombok.Getter;
+import lombok.Setter;
+#foreach($voImportField in ${table.voImportList})
+$voImportField
+#end
+
+/**
+ * ${tableComment}
+ *
+ * @author ${table.author}
+ * @history ${table.date} 新建
+ * @since ${table.since}
+ */
+@Getter
+@Setter
+public class ${className}Vo {
+
+#foreach ($column in $columns)
+#if($column.voField)
+    /**
+     * $column.columnComment
+     */
+    private $column.javaType $column.camelName;
+
+#end
+#end
+}

@@ -1,0 +1,8 @@
+package ${table.basePackage}.${moduleName}.mapper;
+
+import ${table.commonBasePackage}.common.base.BaseMapper;
+import ${table.basePackage}.${moduleName}.bo.${className}Bo;
+import ${table.basePackage}.${moduleName}.dto.${className}Dto;
+
+public interface ${className}Mapper extends BaseMapper<${className}Bo, ${className}Dto> {
+}

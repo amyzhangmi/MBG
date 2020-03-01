@@ -1,0 +1,201 @@
+<template>
+    <el-card class="box-card">
+        <el-breadcrumb separator-class="el-icon-arrow-right" class="common-margin">
+            <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
+            <el-breadcrumb-item>活动管理</el-breadcrumb-item>
+            <el-breadcrumb-item>活动列表</el-breadcrumb-item>
+            <el-breadcrumb-item>活动详情</el-breadcrumb-item>
+        </el-breadcrumb>
+        <el-form :inline="true" :model="searchForm">
+#foreach ($column in $columns)
+#if($column.vueField)
+            <el-form-item label="$column.columnComment">
+                <el-input v-model="searchForm.$column.camelName" placeholder="$column.columnComment"></el-input>
+            </el-form-item>
+#end
+#end
+            <el-form-item>
+                <el-button type="success" @click="handleSearch">查询</el-button>
+            </el-form-item>
+            <el-form-item>
+                <el-button type="primary" @click="handleOpenAddDialog">添加${tableComment}</el-button>
+            </el-form-item>
+        </el-form>
+        <el-table
+                :data="pagenation.rows"
+                border
+                max-height="650"
+                size="mini"
+                style="width: 100%"
+                class="common-margin"
+        >
+#foreach ($column in $columns)
+#if($column.vueType == 'date')
+            <el-table-column align="center" label="$column.columnComment" prop="$column.camelName" width="160">
+                <template slot-scope="scope">
+                    <span>{{ parseTime(scope.row.$column.camelName) }}</span>
+                </template>
+            </el-table-column>
+#else
+            <el-table-column align="center" prop="$column.camelName" label="$column.columnComment"></el-table-column>
+#end
+#end
+            <el-table-column label="操作" align="center" width="160">
+                <template slot-scope="scope">
+                    <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+                    <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+        <el-pagination
+                class="common-margin"
+                background
+                :hide-on-single-page="true"
+                @size-change="handleSizeChange"
+                @current-change="handleCurrentChange"
+                :current-page="pagenation.pageNow"
+                :page-sizes="[10, 20, 50, 100]"
+                :page-size="pagenation.pageSize"
+                layout="total, sizes, prev, pager, next, jumper"
+                :total="pagenation.total"
+        ></el-pagination>
+
+        <!-- 添加${tableComment}对话框 -->
+        <el-dialog
+                title="新增/编辑${tableComment}"
+                width="40%"
+                :close-on-click-modal="false"
+                :close-on-press-escape="false"
+                :show-close="false"
+                :visible.sync="showAddFlag"
+                :before-close="handleCloseAddDialog"
+        >
+            <el-form ref="addForm" label-width="80px">
+#foreach ($column in $columns)
+#if($column.vueField)
+#if($velocityCount %2 == 1)
+                <el-row>
+#end
+                    <el-col :span="12">
+                        <el-form-item label="$column.columnComment:">
+                            <el-input v-model="addForm.$column.camelName" #if($column.pk):disabled="true"#end></el-input>
+                        </el-form-item>
+                    </el-col>
+#if($velocityCount %2 == 0 || $velocityCount == $columns.size())
+                </el-row>
+#end
+#end
+#end
+                <el-row>
+                    <el-col :span="8" :offset="8">
+                        <el-button size="small" @click="handleCloseAddDialog">取消</el-button>
+                        <el-button type="primary" size="small" @click="handleAddSubmit">立即提交</el-button>
+                    </el-col>
+                </el-row>
+            </el-form>
+        </el-dialog>
+    </el-card>
+</template>
+<script>
+import { list, add, detail, del } from "@/api/${moduleName}/${table.camelName}";
+export default {
+  data() {
+    return {
+      searchForm: {
+#foreach ($column in $columns)
+#if($column.vueField)
+        $column.camelName: "",
+#end
+#end
+      },
+      showAddFlag: false,
+      addForm: {
+#foreach ($column in $columns)
+#if($column.vueField)
+#if($column.vueType == 'number')
+        $column.camelName: 0,
+#elseif($column.vueType == 'string')
+        $column.camelName: "",
+#end
+#end
+#end
+      },
+      pagenation: {
+        total: 0,
+        pageNow: 1,
+        pageSize: 10,
+        rows: []
+      }
+    };
+  },
+  methods: {
+    initData() {
+
+    },
+    page() {
+      this.searchForm.pageNow = this.pagenation.pageNow;
+      this.searchForm.pageSize = this.pagenation.pageSize;
+      list(this.searchForm).then(res => {
+        this.pagenation = res.data.data;
+      });
+    },
+    handleOpenAddDialog() {
+      this.addForm = {};
+      this.showAddFlag = true;
+    },
+    handleAddSubmit() {
+      add(this.addForm).then(res => {
+        this.success("添加/修改${tableComment}成功}");
+        this.searchForm = {};
+        this.handleSearch();
+        this.showAddFlag = false;
+      });
+    },
+    handleCloseAddDialog() {
+      this.showAddFlag = false;
+    },
+    handleEdit(index,row) {
+      detail({id:row.#foreach ($column in $columns)#if($column.pk)$column.camelName#end#end}).then(res => {
+#foreach ($column in $columns)
+#if($column.vueField)
+        this.addForm.$column.camelName = res.data.data.$column.camelName;
+#end
+#end
+        this.showAddFlag = true;
+      });
+
+    },
+    handleDelete(index, row) {
+      if(row.isDeleted == 1){
+        this.success("删除成功,请不要重复删除！");
+        return;
+      }
+      del({ id: row.#foreach ($column in $columns)#if($column.pk)$column.camelName#end#end }).then(res => {
+        this.success("删除成功");
+        this.handleSearch();
+      });
+    },
+    handleSearch() {
+      this.pagenation.pageNow = 1;
+      this.pagenation.pageSize = 10;
+      this.page();
+    },
+    handleSizeChange(pageSize) {
+      this.pagenation.pageSize = pageSize;
+      this.page();
+    },
+    handleCurrentChange(pageNow) {
+      this.pagenation.pageNow = pageNow;
+      this.page();
+    }
+  },
+  created() {
+    this.initData();
+    this.page();
+  }
+};
+</script>
+
+<style>
+
+</style>

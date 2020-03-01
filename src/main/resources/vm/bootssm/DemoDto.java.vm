@@ -1,0 +1,29 @@
+package ${table.basePackage}.${moduleName}.dto;
+
+import ${table.commonBasePackage}.common.dto.BaseDto;
+import lombok.Getter;
+import lombok.Setter;
+#foreach($dtoImportField in ${table.dtoImportList})
+$dtoImportField
+#end
+/**
+ * ${tableComment}
+ *
+ * @author ${table.author}
+ * @history ${table.date} 新建
+ * @since ${table.since}
+ */
+@Getter
+@Setter
+public class ${className}Dto extends BaseDto {
+
+#foreach ($column in $columns)
+#if($column.dtoField)
+    /**
+     * $column.columnComment
+     */
+    private $column.javaType $column.camelName;
+
+#end
+#end
+}

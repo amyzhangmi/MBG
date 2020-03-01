@@ -1,0 +1,51 @@
+package ${table.basePackage}.${moduleName}.controller;
+
+import ${table.commonBasePackage}.common.base.BaseController;
+import ${table.commonBasePackage}.common.dto.QueryByIdDto;
+import ${table.commonBasePackage}.common.entity.Result;
+import ${table.basePackage}.${moduleName}.dto.${className}Dto;
+import ${table.basePackage}.${moduleName}.service.${className}Service;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
+/**
+ * @author 张咪
+ * @history 2020/2/13 新建
+ * @since JDK1.7
+ */
+@RestController
+@RequestMapping("/${moduleName}/${table.camelName}")
+public class ${className}Controller extends BaseController {
+
+    @Autowired
+    ${className}Service ${table.camelName}Service;
+
+    @RequestMapping(value = "/add",method = RequestMethod.POST)
+    public Result add(@RequestBody ${className}Dto dto){
+        if(null != dto.get#foreach ($column in $columns)#if($column.pk)$column.upperFirstName#end#end() && dto.get#foreach ($column in $columns)#if($column.pk)$column.upperFirstName#end#end() > 0){
+            return ${table.camelName}Service.update(dto);
+        }else {
+            return ${table.camelName}Service.insert(dto);
+        }
+    }
+
+    @RequestMapping(value = "/list",method = RequestMethod.POST)
+    public Result list(@RequestBody ${className}Dto dto){
+        return ${table.camelName}Service.findPage(dto);
+    }
+
+    @RequestMapping(value = "/get",method = RequestMethod.POST)
+    public Result get(@RequestBody QueryByIdDto dto){
+        return ${table.camelName}Service.findById(dto.getId());
+    }
+
+    @RequestMapping(value = "/del",method = RequestMethod.POST)
+    public Result del(@RequestBody QueryByIdDto dto){
+        return ${table.camelName}Service.delete(dto.getId());
+    }
+
+
+}

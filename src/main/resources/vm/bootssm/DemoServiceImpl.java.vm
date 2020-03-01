@@ -1,0 +1,61 @@
+package ${table.basePackage}.${moduleName}.service.impl;
+
+import ${table.commonBasePackage}.common.entity.Page;
+import ${table.commonBasePackage}.common.entity.Result;
+import ${table.basePackage}.${moduleName}.bo.${className}Bo;
+import ${table.basePackage}.${moduleName}.dto.${className}Dto;
+import ${table.basePackage}.${moduleName}.mapper.${className}Mapper;
+import ${table.basePackage}.${moduleName}.service.${className}Service;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+/**
+ * @author 张咪
+ * @history 2020/2/13 新建
+ * @since JDK1.7
+ */
+@Service
+public class ${className}ServiceImpl implements ${className}Service {
+
+    @Autowired
+    ${className}Mapper ${table.camelName}Mapper;
+
+    @Override
+    public Result insert(${className}Dto ${table.camelName}Dto) {
+        ${className}Bo bo = new ${className}Bo();
+        BeanUtils.copyProperties(${table.camelName}Dto,bo);
+        long count = ${table.camelName}Mapper.insert(bo);
+        return Result.success(count);
+    }
+
+    @Override
+    public Result update(${className}Dto ${table.camelName}Dto) {
+        ${className}Bo bo = new ${className}Bo();
+        BeanUtils.copyProperties(${table.camelName}Dto,bo);
+        long count = ${table.camelName}Mapper.update(bo);
+        return Result.success(count);
+    }
+
+    @Override
+    public Result findById(Long id) {
+        ${className}Bo ${table.camelName}Bo = ${table.camelName}Mapper.findById(id);
+        return Result.success(${table.camelName}Bo);
+    }
+
+    @Override
+    public Result findPage(${className}Dto ${table.camelName}Dto) {
+        long count = ${table.camelName}Mapper.findCount(${table.camelName}Dto);
+        List<${className}Bo> list = ${table.camelName}Mapper.findPage(${table.camelName}Dto);
+        Page page = new Page(${table.camelName}Dto.getPageNow(),${table.camelName}Dto.getPageSize(),count,list);
+        return Result.success(page);
+    }
+
+    @Override
+    public Result delete(Long id) {
+        long count = ${table.camelName}Mapper.delete(id);
+        return Result.success(count);
+    }
+}
